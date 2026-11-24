@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>19淇｜星語星座運勢占卜</title>
+  <style>
+    :root {
+      --bg-dark: #090c18;
+      --bg-card: rgba(20, 26, 48, 0.78);
+      --border-glow: rgba(245, 208, 122, 0.35);
+      --text-main: #f4f6fb;
+      --text-muted: #a6b0cf;
+      --accent-gold: #f5d07a;
+      --accent-purple: #9b72ff;
+      --accent-pink: #ff7eb6;
+      --accent-cyan: #5ce1e6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", sans-serif;
+      background: radial-gradient(circle at 20% 15%, #1d163b 0%, var(--bg-dark) 55%, #05070f 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.65;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* 背景星點裝飾 */
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(2px 2px at 12% 20%, rgba(255, 255, 255, 0.8), transparent),
+        radial-gradient(1.5px 1.5px at 28% 72%, rgba(245, 208, 122, 0.75), transparent),
+        radial-gradient(2px 2px at 48% 35%, rgba(255, 255, 255, 0.65), transparent),
+        radial-gradient(1.5px 1.5px at 67% 18%, rgba(155, 114, 255, 0.8), transparent),
+        radial-gradient(2px 2px at 82% 62%, rgba(255, 255, 255, 0.7), transparent),
+        radial-gradient(1px 1px at 91% 84%, rgba(245, 208, 122, 0.8), transparent),
+        radial-gradient(1.5px 1.5px at 18% 88%, rgba(255, 255, 255, 0.55), transparent);
+      z-index: 0;
+    }
+
+    /* 網站右上角固定顯示 19淇 */
+    .top-right-badge {
+      position: fixed;
+      top: 18px;
+      right: 22px;
+      z-index: 100;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(18, 22, 42, 0.88);
+      border: 1px solid rgba(245, 208, 122, 0.65);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(245, 208, 122, 0.22);
+      backdrop-filter: blur(10px);
+      font-weight: 700;
+      font-size: 0.98rem;
+      letter-spacing: 0.08em;
+      color: var(--accent-gold);
+      user-select: none;
+    }
+
+    .top-right-badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-gold);
+      box-shadow: 0 0 10px var(--accent-gold);
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 84px 20px 60px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    header h1 {
+      font-size: clamp(1.85rem, 4vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      background: linear-gradient(120deg, #fff5d6 0%, var(--accent-gold) 45%, #c7a6ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 20px;
+      padding: 26px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: flex-end;
+    }
+
+    .input-group {
+      flex: 1 1 240px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--accent-gold);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    input[type="date"] {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(9, 13, 28, 0.85);
+      color: var(--text-main);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      color-scheme: dark;
+    }
+
+    input[type="date"]:focus {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 3px rgba(245, 208, 122, 0.18);
+    }
+
+    button.btn-submit {
+      padding: 13px 26px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-gold), #e0ab46);
+      color: #16130b;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: 0 8px 22px rgba(245, 208, 122, 0.28);
+    }
+
+    button.btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 26px rgba(245, 208, 122, 0.4);
+    }
+
+    button.btn-submit:active {
+      transform: translateY(0);
+    }
+
+    .error-msg {
+      margin-top: 12px;
+      color: #ff8a8a;
+      font-size: 0.9rem;
+      min-height: 1.2em;
+    }
+
+    /* 運勢結果區 */
+    .result-section {
+      margin-top: 26px;
+      display: none;
+      animation: fadeUp 0.35s ease;
+    }
+
+    .result-section.show {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .zodiac-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 18px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .zodiac-identity {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .zodiac-symbol {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      background: rgba(155, 114, 255, 0.16);
+      border: 1px solid rgba(155, 114, 255, 0.45);
+    }
+
+    .zodiac-name {
+      font-size: 1.55rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .zodiac-meta {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .date-tag {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(245, 208, 122, 0.14);
+      border: 1px solid rgba(245, 208, 122, 0.35);
+      color: var(--accent-gold);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .score-box {
+      background: rgba(10, 14, 29, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .score-label {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .score-stars {
+      color: var(--accent-gold);
+      font-size: 1rem;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+
+    .fortune-list {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .fortune-item {
+      background: rgba(10, 14, 29, 0.55);
+      border-left: 3px solid var(--accent-purple);
+      border-radius: 0 12px 12px 0;
+      padding: 12px 16px;
+    }
+
+    .fortune-item.love { border-left-color: var(--accent-pink); }
+    .fortune-item.career { border-left-color: var(--accent-cyan); }
+    .fortune-item.wealth { border-left-color: var(--accent-gold); }
+
+    .fortune-item h3 {
+      font-size: 0.96rem;
+      margin-bottom: 4px;
+      color: #ffffff;
+    }
+
+    .fortune-item p {
+      font-size: 0.93rem;
+      color: #d8def0;
+    }
+
+    .lucky-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .lucky-pill {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 6px 12px;
+      border-radius: 10px;
+    }
+
+    .lucky-pill strong {
+      color: var(--accent-gold);
+    }
+
+    @media (max-width: 520px) {
+      .top-right-badge {
+        top: 12px;
+        right: 12px;
+        padding: 6px 13px;
+        font-size: 0.9rem;
+      }
+
+      .card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+
+  <!-- 網站右上角顯示 19淇 -->
+  <div class="top-right-badge" aria-label="站點標記 19淇">
+    <span class="dot"></span>
+    <span>19淇</span>
+  </div>
+
+  <main class="container">
+    <header>
+      <h1>星語星座運勢占卜</h1>
+      <p>輸入您的出生日期，立即解析專屬星座與今日運勢指引</p>
+    </header>
+
+    <section class="card">
+      <form id="birthdayForm" novalidate>
+        <div class="form-row">
+          <div class="input-group">
+            <label for="birthdayInput">選擇您的生日</label>
+            <input type="date" id="birthdayInput" required />
+          </div>
+          <button type="submit" class="btn-submit">查詢星座運勢</button>
+        </div>
+        <div id="errorMsg" class="error-msg"></div>
+      </form>
+
+      <div id="resultSection" class="result-section" aria-live="polite">
+        <div class="zodiac-header">
+          <div class="zodiac-identity">
+            <div id="zodiacSymbol" class="zodiac-symbol">♈</div>
+            <div>
+              <div id="zodiacName" class="zodiac-name">牡羊座</div>
+              <div id="zodiacMeta" class="zodiac-meta">03/21 - 04/19・火象星座</div>
+            </div>
+          </div>
+          <div id="todayLabel" class="date-tag">今日運勢</div>
+        </div>
+
+        <div class="score-grid">
+          <div class="score-box">
+            <div class="score-label">整體運勢</div>
+            <div id="overallStars" class="score-stars">★★★★☆</div>
+          </div>
+          <div class="score-box">
+            <div class="score-label">愛情運勢</div>
+            <div id="loveStars" class="score-stars">★★★★☆</div>
+          </div>
+          <div class="score-box">
+            <div class="score-label">事業／學業</div>
+            <div id="careerStars" class="score-stars">★★★★☆</div>
+          </div>
+          <div class="score-box">
+            <div class="score-label">財富運勢</div>
+            <div id="wealthStars" class="score-stars">★★★☆☆</div>
+          </div>
+        </div>
+
+        <div class="fortune-list">
+          <div class="fortune-item">
+            <h3>✨ 整體指引</h3>
+            <p id="overallText"></p>
+          </div>
+          <div class="fortune-item love">
+            <h3>💖 愛情與人際</h3>
+            <p id="loveText"></p>
+          </div>
+          <div class="fortune-item career">
+            <h3>🚀 事業與學業</h3>
+            <p id="careerText"></p>
+          </div>
+          <div class="fortune-item wealth">
+            <h3>💎 財運提醒</h3>
+            <p id="wealthText"></p>
+          </div>
+        </div>
+
+        <div class="lucky-bar">
+          <div class="lucky-pill">幸運色：<strong id="luckyColor">曜石黑</strong></div>
+          <div class="lucky-pill">幸運數字：<strong id="luckyNumber">7</strong></div>
+          <div class="lucky-pill">開運建議：<strong id="luckyTip">保持專注與步調</strong></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const ZODIACS = [
+      { name: "魔羯座", symbol: "♑", element: "土象星座", range: "12/22 - 01/19" },
+      { name: "水瓶座", symbol: "♒", element: "風象星座", range: "01/20 - 02/18" },
+      { name: "雙魚座", symbol: "♓", element: "水象星座", range: "02/19 - 03/20" },
+      { name: "牡羊座", symbol: "♈", element: "火象星座", range: "03/21 - 04/19" },
+      { name: "金牛座", symbol: "♉", element: "土象星座", range: "04/20 - 05/20" },
+      { name: "雙子座", symbol: "♊", element: "風象星座", range: "05/21 - 06/21" },
+      { name: "巨蟹座", symbol: "♋", element: "水象星座", range: "06/22 - 07/22" },
+      { name: "獅子座", symbol: "♌", element: "火象星座", range: "07/23 - 08/22" },
+      { name: "處女座", symbol: "♍", element: "土象星座", range: "08/23 - 09/22" },
+      { name: "天秤座", symbol: "♎", element: "風象星座", range: "09/23 - 10/23" },
+      { name: "天蠍座", symbol: "♏", element: "水象星座", range: "10/24 - 11/22" },
+      { name: "射手座", symbol: "♐", element: "火象星座", range: "11/23 - 12/21" }
+    ];
+
+    const FORTUNE_POOL = {
+      overall: [
+        "能量流暢的一天，適合把擱置的計畫重新拿出來推進，小步快跑會比急於求成更有收穫。",
+        "直覺敏銳，面對選擇時相信第一眼的感覺；午後半適合整理思緒與環境，讓心情歸零。",
+        "節奏穩健，身邊容易出現值得參考的提醒，保持開放心態能讓事情往更順的方向發展。",
+        "氣場明亮，適合與信任的夥伴交流想法，一個隨意的靈感可能成為不錯的起點。"
+      ],
+      love: [
+        "真誠的傾聽比華麗的承諾更打動人心，有伴者適合安排輕鬆的相處時光；單身者不妨多微笑。",
+        "情感互動細膩，避免因為小事過度猜測，直接而溫柔地表達需求會讓關係更靠近。",
+        "人際磁場不錯，聚會或聊天中容易遇到聊得來的對象，放慢腳步更能看清真實心意。"
+      ],
+      career: [
+        "專注力在關鍵時刻特別突出，先把核心任務完成，再處理繁瑣細節，效率會明顯提升。",
+        "適合溝通協調與提案發想，條理分明地說明重點，容易獲得主管、師長或客戶的認同。",
+        "遇到卡關時不妨換個角度拆解問題，適度向經驗豐富的人請教能省下不少摸索時間。"
+      ],
+      wealth: [
+        "收支大致平衡，購物前多停頓十秒思考是否 truly 需要，能守住不少隱形開銷。",
+        "財運平穩偏吉，適合檢視訂閱服務或日常帳目，理財規劃以穩健為主、避免衝動跟風。",
+        "可能會有意想不到的折讓、回饋或小確幸，但大額支出仍建議貨比三家後再決定。"
+      ],
+      colors: ["暮光紫", "暖陽金", "冰川藍", "鼠尾草綠", "珊瑚粉", "珍珠白"],
+      tips: ["喝杯溫水再做決定", "留出 15 分鐘獨處", "把待辦事項減半", "主動傳一則問候"]
+    };
+
+    function getZodiacByMonthDay(month, day) {
+      if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return ZODIACS[0];
+      if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return ZODIACS[1];
+      if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return ZODIACS[2];
+      if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return ZODIACS[3];
+      if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return ZODIACS[4];
+      if ((month === 5 && day >= 21) || (month === 6 && day <= 21)) return ZODIACS[5];
+      if ((month === 6 && day >= 22) || (month === 7 && day <= 22)) return ZODIACS[6];
+      if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return ZODIACS[7];
+      if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return ZODIACS[8];
+      if ((month === 9 && day >= 23) || (month === 10 && day <= 23)) return ZODIACS[9];
+      if ((month === 10 && day >= 24) || (month === 11 && day <= 22)) return ZODIACS[10];
+      return ZODIACS[11];
+    }
+
+    function hashSeed(str) {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+      }
+      return hash;
+    }
+
+    function toStars(score) {
+      const clamped = Math.max(3, Math.min(5, score));
+      return "★".repeat(clamped) + "☆".repeat(5 - clamped);
+    }
+
+    function formatTodayKey() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function renderFortune(dateStr) {
+      const errorMsg = document.getElementById("errorMsg");
+      if (!dateStr) {
+        errorMsg.textContent = "請先選擇有效的出生日期。";
+        return;
+      }
+
+      const parts = dateStr.split("-");
+      if (parts.length !== 3) {
+        errorMsg.textContent = "日期格式不正確，請重新選擇。";
+        return;
+      }
+
+      const month = parseInt(parts[1], 10);
+      const day = parseInt(parts[2], 10);
+      if (Number.isNaN(month) || Number.isNaN(day) || month < 1 || month > 12 || day < 1 || day > 31) {
+        errorMsg.textContent = "請輸入有效的生日日期。";
+        return;
+      }
+
+      errorMsg.textContent = "";
+
+      const zodiac = getZodiacByMonthDay(month, day);
+      const todayKey = formatTodayKey();
+      const seed = hashSeed(`${zodiac.name}-${todayKey}`);
+
+      const pick = (arr, offset = 0) => arr[(seed + offset) % arr.length];
+      const scoreAt = (offset) => 3 + ((seed + offset) % 3); // 3 ~ 5 顆星
+
+      document.getElementById("zodiacSymbol").textContent = zodiac.symbol;
+      document.getElementById("zodiacName").textContent = zodiac.name;
+      document.getElementById("zodiacMeta").textContent = `${zodiac.range}・${zodiac.element}（生日：${month}/${day}）`;
+      document.getElementById("todayLabel").textContent = `今日運勢｜${todayKey}`;
+
+      document.getElementById("overallStars").textContent = toStars(scoreAt(1));
+      document.getElementById("loveStars").textContent = toStars(scoreAt(2));
+      document.getElementById("careerStars").textContent = toStars(scoreAt(3));
+      document.getElementById("wealthStars").textContent = toStars(scoreAt(4));
+
+      document.getElementById("overallText").textContent = pick(FORTUNE_POOL.overall, 0);
+      document.getElementById("loveText").textContent = pick(FORTUNE_POOL.love, 1);
+      document.getElementById("careerText").textContent = pick(FORTUNE_POOL.career, 2);
+      document.getElementById("wealthText").textContent = pick(FORTUNE_POOL.wealth, 3);
+
+      document.getElementById("luckyColor").textContent = pick(FORTUNE_POOL.colors, 5);
+      document.getElementById("luckyNumber").textContent = String((seed % 9) + 1);
+      document.getElementById("luckyTip").textContent = pick(FORTUNE_POOL.tips, 7);
+
+      document.getElementById("resultSection").classList.add("show");
+    }
+
+    document.getElementById("birthdayForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const val = document.getElementById("birthdayInput").value;
+      renderFortune(val);
+    });
+  </script>
+</body>
+</html>
